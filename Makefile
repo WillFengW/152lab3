@@ -1,21 +1,8 @@
-CC = g++
-CFLAGS = -g -O0 -std=c++11
+CFLAGS = -g -Wall -ansi -pedantic
 
-SRC  = lib.cpp                        # list of C++ source files
-OBJS = $(patsubst %.cpp, %.o, $(SRC)) # list of object files
-
-
-miniL: miniL-lex.o miniL-parser.o $(OBJS)
-	$(CC) $^ -o $@ -lfl
-
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
-
-miniL-lex.cpp: miniL.lex miniL-parser.cpp
-	flex -o $@ $< 
-
-miniL-parser.cpp: miniL.y
-	bison -d -v -g -o $@ $<
-
+miniL: miniL.lex miniL.y
+	bison -d -v miniL.y
+	flex miniL.lex
+	g++ $(CFLAGS) -std=c++11 lex.yy.c miniL.tab.c -lfl -o miniL
 clean:
-	rm -f *.o miniL-lex.cpp miniL-parser.cpp miniL-parser.hpp stack.hh *.output *.dot miniL
+	rm -f lex.yy.c *.output *.tab.h *.tab.c
